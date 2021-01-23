@@ -1,8 +1,9 @@
 {
   "name": "@mntm/precoil",
-  "version": "1.0.0",
-  "type": "module",
+  "version": "1.2.1",
   "main": "dist/index.js",
+  "module": "dist/index.js",
+  "jsnext:main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": {
     "name": "Anton Petrov",
@@ -17,11 +18,11 @@
     "mutable",
     "live"
   ],
-  "homepage": "https://github.com/maxi-team/recoil",
-  "bugs": "https://github.com/maxi-team/recoil/issues",
+  "homepage": "https://github.com/maxi-team/precoil",
+  "bugs": "https://github.com/maxi-team/precoil/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maxi-team/recoil.git"
+    "url": "https://github.com/maxi-team/precoil.git"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json"
@@ -30,10 +31,10 @@
     "mitt": "^2.1.0"
   },
   "devDependencies": {
-    "@mntm/eslint-config": "^0.1.0",
+    "@mntm/eslint-config": "^0.2.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "eslint": "^7.17.0",
+    "eslint": "^7.18.0",
     "typescript": "^4.1.3"
   },
   "peerDependencies": {

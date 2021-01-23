@@ -1,13 +1,9 @@
 import type { Atom, Selector } from '../types';
-import type { DependencyList } from 'react';
 
 import { useReducer, useEffect, useRef, useState, useMemo } from 'react';
-import { broadcast } from './shared';
+import { broadcast, constRef, constDependencyList } from './shared';
 import { select } from '../store';
 import { shallowEqual } from '../utils';
-
-const constRef = {};
-const constDependencyList: DependencyList = [];
 
 const subscribeReducer = () => ({});
 export const usePrecoilSubscribe = (key: string) => {
@@ -53,7 +49,7 @@ export const usePrecoilSelector = <T, S>(atom: Atom<T>, selector: Selector<T, S>
 
     broadcast.on(atom.key, update);
     return () => broadcast.off(atom.key, update);
-  }, [selector]);
+  }, [ selector ]);
 
   return state;
 };

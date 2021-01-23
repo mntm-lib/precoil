@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { useEffect } from 'react';
 import { updater } from '../store';
-import { batch, broadcast } from './shared';
+import { batch, broadcast, constDependencyList } from './shared';
 
 export const PrecoilRoot: FC = ({ children }) => {
   useEffect(() => {
@@ -11,7 +11,7 @@ export const PrecoilRoot: FC = ({ children }) => {
         broadcast.emit(type);
       });
     });
-  }, []);
+  }, constDependencyList);
 
   return (
     <>
