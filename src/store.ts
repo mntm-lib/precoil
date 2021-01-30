@@ -17,7 +17,7 @@ export const setter = <T>(key: string, value: AtomValOrUpdater<T>): T => {
   const next = isUpdater(value) ? value(getter(key)) : value;
   const has = key in store;
 
-  if (!has || shallowEqual(store[key], next)) {
+  if (!has || !shallowEqual(store[key], next)) {
     store[key] = next;
 
     if (has) {
