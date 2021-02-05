@@ -49,7 +49,7 @@ export const usePrecoilSelector = <T, S>(atom: Atom<T>, selector: Selector<T, S>
 
     broadcast.on(atom.key, update);
     return () => broadcast.off(atom.key, update);
-  }, [ selector ]);
+  }, [selector]);
 
   return state;
 };

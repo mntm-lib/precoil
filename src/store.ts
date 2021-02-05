@@ -1,5 +1,4 @@
 import mitt from 'mitt';
-import { shallowEqual } from './utils';
 
 import type { Store, Atom, AtomUpdater, AtomValOrUpdater, Selector } from './types';
 
@@ -17,7 +16,7 @@ export const setter = <T>(key: string, value: AtomValOrUpdater<T>): T => {
   const next = isUpdater(value) ? value(getter(key)) : value;
   const has = key in store;
 
-  if (!has || !shallowEqual(store[key], next)) {
+  if (!has || store[key] !== next) {
     store[key] = next;
 
     if (has) {
