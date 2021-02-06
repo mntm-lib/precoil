@@ -17,11 +17,6 @@ export {
 } from './store';
 
 export {
-  shallowEqual
-} from './utils';
-
-export {
-  batch,
   broadcast,
   PrecoilRoot,
   usePrecoilConst,

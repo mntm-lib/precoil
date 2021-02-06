@@ -1,4 +1,4 @@
-# @mntm/precoil [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/eolme/precoil/blob/master/LICENSE) [![npm bundle size](https://img.shields.io/bundlephobia/min/@mntm/precoil)](https://bundlephobia.com/result?p=@mntm/precoil)
+# @mntm/precoil [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maxi-team/precoil/blob/master/LICENSE) [![npm bundle size](https://img.shields.io/bundlephobia/min/@mntm/precoil)](https://bundlephobia.com/result?p=@mntm/precoil)
 
 **Docs:** [RU](./docs/RU.md) | EN
 

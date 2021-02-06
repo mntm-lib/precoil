@@ -1,17 +1,17 @@
 import type { Atom, Selector } from '../types';
 
-import { useReducer, useEffect, useRef, useState, useMemo } from 'react';
-import { broadcast, constRef, constDependencyList } from './shared';
-import { select } from '../store';
-import { shallowEqual } from '../utils';
+import { useEffect, useRef, useState } from 'react';
+import { useUpdate, useMount, useCreation, shallowEqual } from '@mntm/shared';
 
-const subscribeReducer = () => ({});
+import { broadcast } from './shared';
+import { select } from '../store';
+
 export const usePrecoilSubscribe = (key: string) => {
-  const [, next] = useReducer(subscribeReducer, constRef);
-  useEffect(() => {
+  const next = useUpdate();
+  useMount(() => {
     broadcast.on(key, next);
     return () => broadcast.off(key, next);
-  }, constDependencyList);
+  });
 };
 
 export const usePrecoilState = <T>(atom: Atom<T>) => {
@@ -55,5 +55,5 @@ export const usePrecoilSelector = <T, S>(atom: Atom<T>, selector: Selector<T, S>
 };
 
 export const usePrecoilSelectorConst = <T, S>(atom: Atom<T>, selector: Selector<T, S>): S => {
-  return useMemo(() => select(atom, selector), constDependencyList);
+  return useCreation(() => select(atom, selector));
 };

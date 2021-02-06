@@ -13,6 +13,5 @@ export {
 } from './root';
 
 export {
-  batch,
   broadcast
 } from './shared';

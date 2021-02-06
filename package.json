@@ -1,6 +1,6 @@
 {
   "name": "@mntm/precoil",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "jsnext:main": "dist/index.js",
@@ -10,7 +10,7 @@
     "email": "im@petrov.engineer",
     "url": "https://petrov.engineer"
   },
-  "description": "Experimental state management library",
+  "description": "A reactive event based state management library",
   "license": "MIT",
   "keywords": [
     "state",
@@ -28,6 +28,7 @@
     "build": "tsc --project tsconfig.json"
   },
   "dependencies": {
+    "@mntm/shared": "^1.1.0",
     "mitt": "^2.1.0"
   },
   "devDependencies": {

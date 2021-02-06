@@ -1,21 +1,20 @@
 import type { FC } from 'react';
 
-import { useEffect } from 'react';
+import { batch, castRender, useMount } from '@mntm/shared';
 import { updater } from '../store';
-import { batch, broadcast, constDependencyList } from './shared';
+import { broadcast } from './shared';
 
 export const PrecoilRoot: FC = ({ children }) => {
-  useEffect(() => {
-    updater.on('*', (type) => {
+  useMount(() => {
+    const batcher = (type = '*') => {
       batch(() => {
         broadcast.emit(type);
       });
-    });
-  }, constDependencyList);
+    };
 
-  return (
-    <>
-      {children}
-    </>
-  );
+    updater.on('*', batcher);
+    return () => updater.off('*', batcher);
+  });
+
+  return castRender(children);
 };
