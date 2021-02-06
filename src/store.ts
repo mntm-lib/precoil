@@ -1,7 +1,8 @@
-import mitt from 'mitt';
-
 import type { Store, Atom, AtomUpdater, AtomValOrUpdater, Selector } from './types';
 
+import { weakUniqueId } from '@mntm/shared';
+
+import mitt from 'mitt';
 export const updater = mitt();
 
 export const store: Store = {};
@@ -27,9 +28,7 @@ export const setter = <T>(key: string, value: AtomValOrUpdater<T>): T => {
   return next;
 };
 
-let id = 0;
-const generateKey = () => (++id) + Math.floor(Math.random() * 1E6).toString(32);
-export const atom = <T>(defaultValue: T, key = generateKey()): Atom<T> => {
+export const atom = <T>(defaultValue: T, key = weakUniqueId()): Atom<T> => {
   store[key] = defaultValue;
 
   return {
@@ -38,7 +37,7 @@ export const atom = <T>(defaultValue: T, key = generateKey()): Atom<T> => {
     get() {
       return getter(key);
     },
-    set(value: T) {
+    set(value: AtomValOrUpdater<T>) {
       return setter(key, value);
     }
   };
