@@ -1,11 +1,3 @@
-export type {
-  Atom,
-  AtomUpdater,
-  AtomValOrUpdater,
-  Selector,
-  Store
-} from './types';
-
 export {
   atom,
   select,
@@ -14,7 +6,7 @@ export {
   isUpdater,
   store,
   updater
-} from './store';
+} from './store.js';
 
 export {
   broadcast,
@@ -26,4 +18,12 @@ export {
   usePrecoilSubscribe,
   usePrecoilValue,
   useSetPrecoilState
-} from './react';
+} from './react/index.js';
+
+export type {
+  Atom,
+  AtomUpdater,
+  AtomValOrUpdater,
+  Selector,
+  Store
+} from './types.js';

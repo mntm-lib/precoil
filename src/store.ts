@@ -1,13 +1,12 @@
-import type { Store, Atom, AtomUpdater, AtomValOrUpdater, Selector } from './types';
+import type { Store, Atom, AtomUpdater, AtomValOrUpdater, Selector } from './types.js';
 
-import { weakUniqueId } from '@mntm/shared';
+import { mitt, weakUniqueId, isFunction } from '@mntm/shared';
 
-import mitt from 'mitt';
 export const updater = mitt();
 
 export const store: Store = {};
 
-export const isUpdater = <T>(func: AtomValOrUpdater<T>): func is AtomUpdater<T> => typeof func === 'function';
+export const isUpdater = <T>(func: AtomValOrUpdater<T>): func is AtomUpdater<T> => isFunction(func);
 
 export const getter = <T>(key: string): T => {
   return store[key] as T;

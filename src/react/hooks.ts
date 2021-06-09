@@ -1,10 +1,10 @@
-import type { Atom, Selector } from '../types';
+import type { Atom, Selector } from '../types.js';
 
 import { useEffect, useRef, useState } from 'react';
-import { useUpdate, useMount, useCreation, shallowEqual } from '@mntm/shared';
+import { useUpdate, useMount, useCreation, isShallowEqual } from '@mntm/shared';
 
-import { broadcast } from './shared';
-import { select } from '../store';
+import { broadcast } from './shared.js';
+import { select } from '../store.js';
 
 export const usePrecoilSubscribe = (key: string) => {
   const next = useUpdate();
@@ -40,7 +40,10 @@ export const usePrecoilSelector = <T, S>(atom: Atom<T>, selector: Selector<T, S>
   useEffect(() => {
     const update = () => {
       const next = compute();
-      if (shallowEqual(next, last.current)) {
+      if (
+        next !== last.current &&
+        isShallowEqual(next, last.current)
+      ) {
         return;
       }
       last.current = next;

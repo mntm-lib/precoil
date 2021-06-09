@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 
 import { batch, castRender, useMount } from '@mntm/shared';
-import { updater } from '../store';
-import { broadcast } from './shared';
+import { updater } from '../store.js';
+import { broadcast } from './shared.js';
 
 export const PrecoilRoot: FC = ({ children }) => {
   useMount(() => {

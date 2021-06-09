@@ -6,12 +6,12 @@ export {
   usePrecoilSubscribe,
   usePrecoilValue,
   useSetPrecoilState
-} from './hooks';
+} from './hooks.js';
 
 export {
   PrecoilRoot
-} from './root';
+} from './root.js';
 
 export {
   broadcast
-} from './shared';
+} from './shared.js';

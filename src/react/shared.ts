@@ -1,2 +1,3 @@
-import mitt from 'mitt';
+import { mitt } from '@mntm/shared';
+
 export const broadcast = mitt();
