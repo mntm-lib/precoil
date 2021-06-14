@@ -1,4 +1,4 @@
-export type Store = Record<string, unknown>;
+export type Store = Map<string, unknown>;
 
 export type AtomUpdater<T> = (state: T) => T;
 export type AtomValOrUpdater<T> = T | AtomUpdater<T>;

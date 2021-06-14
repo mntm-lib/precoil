@@ -1,26 +1,27 @@
-import type { Store, Atom, AtomUpdater, AtomValOrUpdater, Selector } from './types.js';
+import type { Store, Atom, AtomValOrUpdater, Selector } from './types.js';
 
-import { mitt, weakUniqueId, isFunction } from '@mntm/shared';
+import { mitt, batch, weakUniqueId, isFunction } from '@mntm/shared';
 
 export const updater = mitt();
 
-export const store: Store = {};
-
-export const isUpdater = <T>(func: AtomValOrUpdater<T>): func is AtomUpdater<T> => isFunction(func);
+export const store: Store = new Map();
 
 export const getter = <T>(key: string): T => {
-  return store[key] as T;
+  return store.get(key) as T;
 };
 
 export const setter = <T>(key: string, value: AtomValOrUpdater<T>): T => {
-  const next = isUpdater(value) ? value(getter(key)) : value;
-  const has = key in store;
+  const next = isFunction(value) ? value(getter(key)) : value;
+  const has = store.has(key);
 
-  if (!has || store[key] !== next) {
-    store[key] = next;
+  if (!has || store.get(key) !== next) {
+    store.set(key, next);
 
     if (has) {
-      updater.emit(key, next);
+      // sync
+      batch(() => {
+        updater.emit(key, next);
+      });
     }
   }
 
@@ -28,7 +29,7 @@ export const setter = <T>(key: string, value: AtomValOrUpdater<T>): T => {
 };
 
 export const atom = <T>(defaultValue: T, key = weakUniqueId()): Atom<T> => {
-  store[key] = defaultValue;
+  store.set(key, defaultValue);
 
   return {
     key,

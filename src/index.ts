@@ -1,24 +1,21 @@
 export {
   atom,
-  select,
   getter,
   setter,
-  isUpdater,
+  select,
   store,
   updater
 } from './store.js';
 
 export {
-  broadcast,
-  PrecoilRoot,
-  usePrecoilConst,
-  usePrecoilSelector,
-  usePrecoilSelectorConst,
-  usePrecoilState,
-  usePrecoilSubscribe,
-  usePrecoilValue,
-  useSetPrecoilState
-} from './react/index.js';
+  useAtomConst,
+  useAtomSelector,
+  useAtomSelectorConst,
+  useAtomState,
+  useAtomSubscribe,
+  useAtomValue,
+  useSetAtomState
+} from './hooks.js';
 
 export type {
   Atom,

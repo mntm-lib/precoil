@@ -1,6 +1,6 @@
 {
   "name": "@mntm/precoil",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@mntm/shared": "^2.0.0"
+    "@mntm/shared": "^2.1.0"
   },
   "devDependencies": {
     "@mntm/eslint-config": "^0.2.0",
@@ -44,9 +44,6 @@
   },
   "peerDependenciesMeta": {
     "react": {
-      "optional": true
-    },
-    "react-dom": {
       "optional": true
     }
   }
