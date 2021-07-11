@@ -1,29 +1,29 @@
 import type { Atom, Selector } from './types.js';
 
 import { useEffect, useState } from 'react';
-import { useUpdate, useMount, useCreation } from '@mntm/shared';
+import { useMount, useCreation } from '@mntm/shared';
 
-import { updater } from './store.js';
+import { updater, store } from './store.js';
 
 /** @noinline */
-export const useAtomSubscribe = /*#__NOINLINE__*/(key: string) => {
-  const next = useUpdate();
+export const useAtomSubscribe = /*#__NOINLINE__*/<T>(key: string): T => {
+  const [value, setValue] = useState(store.get(key));
   useMount(() => {
+    const next = () => setValue(store.get(key));
     updater.on(key, next);
     return () => updater.off(key, next);
   });
+  return value as T;
 };
 
 /** @nosideeffects */
 export const useAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  useAtomSubscribe(atom.key);
-  return [atom.get(), atom.set] as const;
+  return [useAtomSubscribe(atom.key), atom.set] as const;
 };
 
 /** @nosideeffects */
 export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>): T => {
-  useAtomSubscribe(atom.key);
-  return atom.get();
+  return useAtomSubscribe(atom.key);
 };
 
 /** @nosideeffects */
@@ -43,7 +43,7 @@ export const useAtomSelector = /*#__NOINLINE__*/<T, S>(atom: Readonly<Atom<T>>, 
 
   useEffect(() => {
     const update = () => {
-      setState(compute);
+      setState(compute());
     };
 
     updater.on(atom.key, update);
