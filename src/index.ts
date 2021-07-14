@@ -2,7 +2,6 @@ export {
   atom,
   getter,
   setter,
-  select,
   store,
   updater
 } from './store.js';
@@ -12,7 +11,6 @@ export {
   useAtomSelector,
   useAtomSelectorConst,
   useAtomState,
-  useAtomSubscribe,
   useAtomValue,
   useSetAtomState
 } from './hooks.js';
