@@ -1,9 +1,10 @@
 {
   "name": "@mntm/precoil",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "author": {
     "name": "Anton Petrov",
     "email": "im@petrov.engineer",
