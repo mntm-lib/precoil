@@ -1,6 +1,7 @@
 import type { Store, Atom, AtomValOrUpdater } from './types.js';
 
-import { mitt, batch, weakUniqueId, isFunction } from '@mntm/shared';
+import { batch, weakUniqueId, isFunction } from '@mntm/shared';
+import { default as mitt } from 'mitt';
 
 export const updater = mitt();
 
