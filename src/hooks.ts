@@ -1,7 +1,7 @@
 import type { Atom, Selector } from './types.js';
 
 import { useEffect, useState } from 'react';
-import { useCreation } from '@mntm/shared';
+import { useCreation, useMount } from '@mntm/shared';
 
 import { updater } from './store.js';
 
@@ -20,11 +20,18 @@ export const useAtomSelector = /*#__NOINLINE__*/<T, S>(atom: Readonly<Atom<T>>, 
   return state;
 };
 
-/** @noinline */
-const reselect = /*#__NOINLINE__*/<T>(value: T) => value;
 /** @nosideeffects */
-export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useAtomSelector(atom, reselect);
+export const useAtomValue = /*#__NOINLINE__*/<T>(atom: Readonly<Atom<T>>) => {
+  const [state, setState] = useState(atom.get);
+
+  useMount(() => {
+    const update = () => setState(atom.get());
+
+    updater.on(atom.key, update);
+    return () => updater.off(atom.key, update);
+  });
+
+  return state;
 };
 
 /** @nosideeffects */
