@@ -27,7 +27,7 @@
     "url": "https://github.com/maxi-team/precoil.git"
   },
   "scripts": {
-    "prebuild": "shx rm -rf dist",
+    "prebuild": "shx rm -rf lib",
     "build": "tsc"
   },
   "dependencies": {
