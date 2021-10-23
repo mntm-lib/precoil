@@ -8,6 +8,6 @@ export type Selector<T, S> = (partial: T) => S;
 export type Atom<T> = {
   key: string;
   default: T;
-  get(): T;
-  set(value: AtomValOrUpdater<T>): T;
+  get: () => T;
+  set: (value: AtomValOrUpdater<T>) => T;
 };

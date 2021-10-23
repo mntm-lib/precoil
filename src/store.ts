@@ -1,9 +1,9 @@
-import type { Store, Atom, AtomValOrUpdater } from './types.js';
+import type { Atom, AtomValOrUpdater, Store } from './types.js';
 
-import { batch, weakUniqueId, isFunction } from '@mntm/shared';
+import { batch, isFunction, weakUniqueId } from '@mntm/shared';
 import { default as mitt } from 'mitt';
 
-export const updater = mitt();
+export const updater = mitt<Record<string, any>>();
 
 export const store: Store = new Map();
 
@@ -16,7 +16,7 @@ export const setter = <T>(key: string) => (value: AtomValOrUpdater<T>): T => {
   if (current !== next) {
     store.set(key, next);
 
-    // sync
+    // Sync update
     batch(() => {
       updater.emit(key, next);
     });

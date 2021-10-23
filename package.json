@@ -1,10 +1,11 @@
 {
   "name": "@mntm/precoil",
-  "version": "4.0.4",
+  "version": "4.1.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "exports": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
+  "jsnext:main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "sideEffects": false,
   "author": {
     "name": "Anton Petrov",
@@ -30,16 +31,16 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@mntm/shared": "^3.0.0",
+    "@mntm/shared": "^3.1.0",
     "mitt": "^3.0.0"
   },
   "devDependencies": {
-    "@mntm/eslint-config": "^0.2.0",
-    "@types/react": "^17.0.15",
-    "@types/react-dom": "^17.0.9",
+    "@mntm/eslint-config": "^0.4.3",
+    "@types/react": "^17.0.31",
+    "@types/react-dom": "^17.0.10",
     "eslint": "^7.32.0",
     "shx": "^0.3.3",
-    "typescript": "^4.3.5"
+    "typescript": "^4.4.4"
   },
   "peerDependencies": {
     "react": "^17.0.2",

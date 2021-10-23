@@ -3,5 +3,10 @@
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
+  },
+  "rules": {
+    "no-inline-comments": "off",
+    "spaced-comment": "off",
+    "unicorn/consistent-function-scoping": "off"
   }
 }

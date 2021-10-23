@@ -12,7 +12,8 @@ export {
   useAtomSelectorConst,
   useAtomState,
   useAtomValue,
-  useSetAtomState
+  useSetAtomState,
+  useResetAtomState
 } from './hooks.js';
 
 export type {
