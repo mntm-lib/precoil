@@ -37,58 +37,6 @@ export const updater = mitt<Record<string, any>>();
 export const store: Store = new Map();
 
 /**
- * Utility function for creating getters.
- *
- * @template T Atom state type.
- *
- * @param key Atom's key.
- *
- * @returns A new getter for the current state of the atom.
- *
- * @example
- *
- *   const getCounter = getter(counterAtom.key);
- *
- *   console.log(getCounter()); // log: 0
- *
- * @noinline
- */
-export const getter = <T>(key: string) => () => store.get(key) as T;
-
-/**
- * Utility function for creating setters.
- *
- * @template T Atom state type.
- *
- * @param key Atom's key.
- *
- * @returns A new setter for the current state of the atom.
- *
- * @example
- *
- *   const setCounter = setter(counterAtom.key);
- *
- *   console.log(setCounter(2)); // log: 2
- *
- * @noinline
- */
-export const setter = <T>(key: string) => (value: AtomValOrUpdater<T>): T => {
-  const current = store.get(key) as T;
-  const next = isFunction(value) ? value(current) : value;
-
-  if (current !== next) {
-    store.set(key, next);
-
-    // Sync update
-    batch(() => {
-      updater.emit(key, next);
-    });
-  }
-
-  return next;
-};
-
-/**
  * An atom represents state in precoil.
  *
  * @description Atoms contain the source of truth for our application state.
@@ -113,10 +61,97 @@ export const setter = <T>(key: string) => (value: AtomValOrUpdater<T>): T => {
 export const atom = <T>(defaultValue: T, key = weakUniqueId()): Atom<T> => {
   store.set(key, defaultValue);
 
+  const _get = () => store.get(key) as T;
+
+  const _set = (value: AtomValOrUpdater<T>) => {
+    const current = store.get(key) as T;
+    const next = isFunction(value) ? value(current) : value;
+
+    if (current !== next) {
+      store.set(key, next);
+
+      // Sync update
+      batch(() => {
+        updater.emit(key, next);
+      });
+    }
+
+    return next;
+  };
+
+  const _sub = (next: (value: T) => void) => {
+    updater.on(key, next);
+
+    return () => updater.off(key, next);
+  };
+
   return {
     key,
-    default: defaultValue,
-    get: getter(key),
-    set: setter(key)
+    def: defaultValue,
+    get: _get,
+    set: _set,
+    sub: _sub
+  };
+};
+
+/**
+ * @todo TODO
+ *
+ * @param get
+ * @param set
+ * @param key
+ * @returns
+ */
+export const dynamicAtom = <T>(
+  get: (
+    get: <V>(atom: Atom<V>) => V
+  ) => T,
+  set: (
+    get: <V>(atom: Atom<V>) => V,
+    set: <V>(atom: Atom<V>, value: AtomValOrUpdater<V>) => V,
+    arg: T
+  ) => T,
+  key = weakUniqueId()
+): Atom<T> => {
+  const depend: string[] = [];
+
+  const defaultValue = get((from) => {
+    const _key = from.key;
+
+    if (depend.includes(_key)) {
+      depend.push(_key);
+    }
+
+    return from.get();
+  });
+
+  const _get = () => get((from) => from.get());
+
+  const _set = (arg: AtomValOrUpdater<T>) => {
+    const next = set(
+      (from) => from.get(),
+      (from, value) => from.set(value),
+      isFunction(arg) ? arg(store.get(key) as T) : arg
+    );
+
+    store.set(key, next);
+
+    return next;
+  };
+
+  const _sub = (next: (value: T) => void) => {
+    const handle = (value: T) => next(_set(value));
+
+    depend.some((_key) => updater.on(_key, handle));
+
+    return () => depend.some((_key) => updater.off(_key, handle));
+  };
+
+  return {
+    key,
+    def: defaultValue,
+    get: _get,
+    set: _set,
+    sub: _sub
   };
 };
