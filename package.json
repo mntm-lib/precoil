@@ -1,6 +1,6 @@
 {
   "name": "@mntm/precoil",
-  "version": "4.1.1",
+  "version": "5.0.0-rc.0",
   "type": "module",
   "main": "./lib/index.js",
   "module": "./lib/index.js",
