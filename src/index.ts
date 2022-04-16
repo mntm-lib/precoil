@@ -1,10 +1,15 @@
 export {
   atom,
-  getter,
-  setter,
+  dynamicAtom,
   store,
   updater
 } from './store.js';
+
+export {
+  resetAtom,
+  resetAtoms,
+  hydrateAtom
+} from './ssr.js';
 
 export {
   useAtomConst,

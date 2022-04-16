@@ -3,8 +3,6 @@ import type { Atom, Selector } from './types.js';
 import { useState } from 'react';
 import { constDeps, useCreation, useHandler, useIsomorphicEffect } from '@mntm/shared';
 
-import { updater } from './store.js';
-
 /**
  * @description This is the recommended hook to use when a component intends to read computed state.
  * Using this hook in a React component will subscribe the component to re-render when the computed
@@ -26,13 +24,7 @@ export const useAtomSelector = /*#__NOINLINE__*/<T, S>(atom: Readonly<Atom<T>>, 
   const [state, handleState] = useState(() => selector(atom.get()));
 
   // Use layout effect for preventing race condition
-  useIsomorphicEffect(() => {
-    const handleSelect = (value: T) => handleState(selector(value));
-
-    updater.on(atom.key, handleSelect);
-
-    return () => updater.off(atom.key, handleSelect);
-  }, [selector]);
+  useIsomorphicEffect(() => atom.sub((value) => handleState(selector(value))), [selector]);
 
   return state;
 };
@@ -54,11 +46,7 @@ export const useAtomValue = /*#__NOINLINE__*/<T>(atom: Readonly<Atom<T>>) => {
   const [state, handleState] = useState(atom.get);
 
   // Use layout effect for preventing race condition
-  useIsomorphicEffect(() => {
-    updater.on(atom.key, handleState);
-
-    return () => updater.off(atom.key, handleState);
-  }, constDeps);
+  useIsomorphicEffect(() => atom.sub(handleState), constDeps);
 
   return state;
 };
@@ -114,7 +102,7 @@ export const useAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  * @nosideeffects
  */
 export const useResetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useHandler(() => atom.set(atom.default));
+  return useHandler(() => atom.set(atom.def));
 };
 
 /**
