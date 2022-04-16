@@ -45,7 +45,7 @@ export const store: Store = new Map();
  *
  * @param defaultValue Initial atom state.
  *
- * @param key A unique string that allows you to indetify the atom.
+ * @param key A unique string that allows you to identify the atom.
  *
  * @returns A new atom that lets you read and update its state.
  *
@@ -95,12 +95,33 @@ export const atom = <T>(defaultValue: T, key = weakUniqueId()): Atom<T> => {
 };
 
 /**
- * @todo TODO
+ * An dynamic atom represents state in precoil.
  *
- * @param get
- * @param set
- * @param key
- * @returns
+ * @description Dynamic atoms depend on other atoms.
+ *
+ * @template T Dynamic atom state type.
+ *
+ * @param get Function to get states of other atoms.
+ *
+ * @param set Function to set new states to other atoms.
+ *
+ * @param key A unique string that allows you to identify the atom.
+ *
+ * @returns A new dynamic atom that lets you read and update dependent
+ * atoms state.
+ *
+ * @example
+ *
+ *   const dynamicCounterAtom = dynamicAtom(
+ *     (get) => get(counterAtom),
+ *     (get, set, arg) => set(counterAtom, arg),
+ *     'dynamicCount'
+ *   );
+ *
+ *   console.log(dynamicCounterAtom.get()); // log: 0
+ *   console.log(dynamicCounterAtom.set(1)); // log: 1
+ *
+ * @noinline
  */
 export const dynamicAtom = <T>(
   get: (

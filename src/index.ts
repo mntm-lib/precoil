@@ -6,6 +6,7 @@ export {
 } from './store.js';
 
 export {
+  resetAtom,
   resetAtoms,
   hydrateAtom
 } from './ssr.js';
