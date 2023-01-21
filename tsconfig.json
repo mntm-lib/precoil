@@ -17,15 +17,14 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
-    "baseUrl": ".",
     "skipLibCheck": true,
     "isolatedModules": true,
     "declaration": true,
     "outDir": "lib"
   },
   "include": [
-    "src/**/*"
+    "src",
+    "vite.config.ts"
   ],
   "exclude": [
     "dist",

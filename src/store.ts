@@ -1,7 +1,11 @@
-import type { Atom, AtomValOrUpdater, Store } from './types.js';
+import type { Atom, AtomUpdater, AtomValOrUpdater, Store } from './types.js';
 
-import { batch, isFunction, weakUniqueId } from '@mntm/shared';
 import { default as mitt } from 'mitt';
+import { batch } from './batch.js';
+
+// Unique id
+let unique = 0;
+const id = () => `${++unique}`;
 
 /**
  * Special EventEmitter for state updates.
@@ -58,14 +62,14 @@ export const store: Store = new Map();
  *
  * @noinline
  */
-export const atom = <T>(defaultValue: T, key = weakUniqueId()): Atom<T> => {
+export const atom = <T>(defaultValue: T, key = id()): Atom<T> => {
   store.set(key, defaultValue);
 
   const _get = () => store.get(key) as T;
 
   const _set = (value: AtomValOrUpdater<T>) => {
     const current = store.get(key) as T;
-    const next = isFunction(value) ? value(current) : value;
+    const next = typeof value === 'function' ? (value as AtomUpdater<T>)(current) : value;
 
     if (current !== next) {
       store.set(key, next);
@@ -132,7 +136,7 @@ export const dynamicAtom = <T>(
     set: <V>(atom: Atom<V>, value: AtomValOrUpdater<V>) => V,
     arg: T
   ) => T,
-  key = weakUniqueId()
+  key = id()
 ): Atom<T> => {
   const depend: string[] = [];
 
@@ -152,7 +156,7 @@ export const dynamicAtom = <T>(
     const next = set(
       (from) => from.get(),
       (from, value) => from.set(value),
-      isFunction(arg) ? arg(store.get(key) as T) : arg
+      typeof arg === 'function' ? (arg as AtomUpdater<T>)(store.get(key) as T) : arg
     );
 
     store.set(key, next);

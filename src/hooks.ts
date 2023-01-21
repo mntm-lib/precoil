@@ -1,7 +1,10 @@
 import type { Atom, Selector } from './types.js';
 
-import { useState } from 'react';
-import { constDeps, useCreation, useHandler, useIsomorphicEffect } from '@mntm/shared';
+import { useRef, useState } from 'react';
+
+// The following is a workaround for CJS.
+import useSyncExternalStoreImport from 'use-sync-external-store/shim';
+import useSyncExternalStoreWithSelectorImport from 'use-sync-external-store/shim/with-selector';
 
 /**
  * @description This is the recommended hook to use when a component intends to read computed state.
@@ -20,13 +23,13 @@ import { constDeps, useCreation, useHandler, useIsomorphicEffect } from '@mntm/s
  *
  * @noinline
  */
-export const useAtomSelector = /*#__NOINLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
-  const [state, handleState] = useState(() => selector(atom.get()));
-
-  // Use layout effect for preventing race condition
-  useIsomorphicEffect(() => atom.sub((value) => handleState(selector(value))), [selector]);
-
-  return state;
+export const useAtomSelector = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
+  return useSyncExternalStoreWithSelectorImport.useSyncExternalStoreWithSelector(
+    atom.sub,
+    atom.get,
+    atom.get,
+    selector
+  );
 };
 
 /**
@@ -40,15 +43,14 @@ export const useAtomSelector = /*#__NOINLINE__*/<T, S>(atom: Readonly<Atom<T>>, 
  *
  *   const counter = useAtomValue(counterAtom);
  *
- * @noinline
+ * @nosideeffects
  */
-export const useAtomValue = /*#__NOINLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  const [state, handleState] = useState(atom.get);
-
-  // Use layout effect for preventing race condition
-  useIsomorphicEffect(() => atom.sub(handleState), constDeps);
-
-  return state;
+export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
+  return useSyncExternalStoreImport.useSyncExternalStore(
+    atom.sub,
+    atom.get,
+    atom.get
+  );
 };
 
 /**
@@ -65,7 +67,7 @@ export const useAtomValue = /*#__NOINLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  * @nosideeffects
  */
 export const useSetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useHandler(atom.set);
+  return useRef(atom.set).current;
 };
 
 /**
@@ -102,7 +104,7 @@ export const useAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  * @nosideeffects
  */
 export const useResetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useHandler(() => atom.set(atom.def));
+  return useRef(() => atom.set(atom.def)).current;
 };
 
 /**
@@ -119,7 +121,7 @@ export const useResetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => 
  * @nosideeffects
  */
 export const useAtomConst = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useCreation(atom.get);
+  return useState(atom.get)[0];
 };
 
 /**
@@ -136,5 +138,5 @@ export const useAtomConst = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  * @nosideeffects
  */
 export const useAtomSelectorConst = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
-  return useCreation(() => selector(atom.get()));
+  return useState(() => selector(atom.get()))[0];
 };
