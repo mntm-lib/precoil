@@ -1,6 +1,6 @@
 import type { Atom, Selector } from './types.js';
 
-import { useRef, useState, useSyncExternalStore } from 'react';
+import * as React from 'react';
 
 /**
  * @description This is the recommended hook to use when a component intends to read computed state.
@@ -20,9 +20,9 @@ import { useRef, useState, useSyncExternalStore } from 'react';
  * @noinline
  */
 export const useAtomSelector = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
-  const reselect = useRef(() => selector(atom.get())).current;
+  const reselect = React.useRef(() => selector(atom.get())).current;
 
-  return useSyncExternalStore(
+  return React.useSyncExternalStore(
     atom.sub,
     reselect,
     reselect
@@ -43,7 +43,7 @@ export const useAtomSelector = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, se
  * @nosideeffects
  */
 export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useSyncExternalStore(
+  return React.useSyncExternalStore(
     atom.sub,
     atom.get,
     atom.get
@@ -64,7 +64,7 @@ export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  * @nosideeffects
  */
 export const useSetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useRef(atom.set).current;
+  return React.useRef(atom.set).current;
 };
 
 /**
@@ -101,7 +101,7 @@ export const useAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  * @nosideeffects
  */
 export const useResetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useRef(() => atom.set(atom.def)).current;
+  return React.useRef(() => atom.set(atom.def)).current;
 };
 
 /**
@@ -118,7 +118,7 @@ export const useResetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => 
  * @nosideeffects
  */
 export const useAtomConst = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useState(atom.get)[0];
+  return React.useState(atom.get)[0];
 };
 
 /**
@@ -135,5 +135,5 @@ export const useAtomConst = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  * @nosideeffects
  */
 export const useAtomSelectorConst = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
-  return useState(() => selector(atom.get()))[0];
+  return React.useState(() => selector(atom.get()))[0];
 };
