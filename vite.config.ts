@@ -41,10 +41,7 @@ export default defineConfig({
       external: [
         'react',
         'react-dom',
-        'mitt',
-        'use-sync-external-store',
-        'use-sync-external-store/shim',
-        'use-sync-external-store/shim/with-selector'
+        'mitt'
       ]
     }
   },

@@ -1,10 +1,6 @@
 import type { Atom, Selector } from './types.js';
 
-import { useRef, useState } from 'react';
-
-// The following is a workaround for CJS.
-import useSyncExternalStoreImport from 'use-sync-external-store/shim';
-import useSyncExternalStoreWithSelectorImport from 'use-sync-external-store/shim/with-selector';
+import { useRef, useState, useSyncExternalStore } from 'react';
 
 /**
  * @description This is the recommended hook to use when a component intends to read computed state.
@@ -24,11 +20,12 @@ import useSyncExternalStoreWithSelectorImport from 'use-sync-external-store/shim
  * @noinline
  */
 export const useAtomSelector = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
-  return useSyncExternalStoreWithSelectorImport.useSyncExternalStoreWithSelector(
+  const reselect = useRef(() => selector(atom.get())).current;
+
+  return useSyncExternalStore(
     atom.sub,
-    atom.get,
-    atom.get,
-    selector
+    reselect,
+    reselect
   );
 };
 
@@ -46,7 +43,7 @@ export const useAtomSelector = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, se
  * @nosideeffects
  */
 export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return useSyncExternalStoreImport.useSyncExternalStore(
+  return useSyncExternalStore(
     atom.sub,
     atom.get,
     atom.get
