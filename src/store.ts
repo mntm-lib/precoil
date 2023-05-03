@@ -1,11 +1,20 @@
-import type { Atom, AtomUpdater, AtomValOrUpdater, Store } from './types.js';
+import type {
+  Atom,
+  AtomKey,
+  AtomStore,
+  AtomStoreUpdate,
+  AtomUpdater,
+  AtomValueUpdate,
+  DynamicAtomGetter,
+  DynamicAtomSetter
+} from './types.js';
 
 import { default as mitt } from 'mitt';
 import { batch } from './batch.js';
 
 // Unique id
-let unique = 0;
-const id = () => `${++unique}`;
+let _id = 0;
+const id = () => Symbol(_id++);
 
 /**
  * Special EventEmitter for state updates.
@@ -17,16 +26,18 @@ const id = () => `${++unique}`;
  * @example
  *
  *   // Logs state on update atom.
- *   updater.on(counterAtom.key, console.log);
+ *   unsafe_updater.on(counterAtom.key, console.log);
  *
  * @example
  *
  *   // Logs state on update atom with `counter` key.
- *   updater.on('counter', console.log);
+ *   unsafe_updater.on('counter', console.log);
  *
  * @see https://github.com/developit/mitt
+ *
+ * @nosideeffects
  */
-export const updater = mitt<Record<string, any>>();
+export const unsafe_updater = /*@__PURE__*/mitt<AtomStoreUpdate>();
 
 /**
  * The source of truth for all created atoms.
@@ -37,8 +48,9 @@ export const updater = mitt<Record<string, any>>();
  *
  *   console.log(store.get('counter')); // log: 0
  *
+ * @nosideeffects
  */
-export const store: Store = new Map();
+export const unsafe_store: AtomStore = /*@__PURE__*/new Map();
 
 /**
  * An atom represents state in precoil.
@@ -49,7 +61,7 @@ export const store: Store = new Map();
  *
  * @param defaultValue Initial atom state.
  *
- * @param key A unique string that allows you to identify the atom.
+ * @param key A unique value that allows you to identify the atom.
  *
  * @returns A new atom that lets you read and update its state.
  *
@@ -62,31 +74,36 @@ export const store: Store = new Map();
  *
  * @noinline
  */
-export const atom = <T>(defaultValue: T, key = id()): Atom<T> => {
-  store.set(key, defaultValue);
+export const atom = <Value>(defaultValue: Value, key: AtomKey = id()): Atom<Value> => {
+  unsafe_store.set(key, defaultValue);
 
-  const _get = () => store.get(key) as T;
+  const _get = () => unsafe_store.get(key) as Value;
 
-  const _set = (value: AtomValOrUpdater<T>) => {
-    const current = store.get(key) as T;
-    const next = typeof value === 'function' ? (value as AtomUpdater<T>)(current) : value;
+  const _set = (update: AtomValueUpdate<Value>) => {
+    const current = unsafe_store.get(key) as Value;
+    const next = typeof update === 'function' ? (update as AtomUpdater<Value>)(current) : update;
 
-    if (current !== next) {
-      store.set(key, next);
+    if (
+      (
+        /* eslint-disable no-self-compare */
+        current === current ||
+        next === next
+      ) &&
+      current !== next
+    ) {
+      unsafe_store.set(key, next);
 
       // Sync update
-      batch(() => {
-        updater.emit(key, next);
-      });
+      batch(() => unsafe_updater.emit(key, next));
     }
 
     return next;
   };
 
-  const _sub = (next: (value: T) => void) => {
-    updater.on(key, next);
+  const _sub = (next: (value: Value) => void) => {
+    unsafe_updater.on(key, next);
 
-    return () => updater.off(key, next);
+    return () => unsafe_updater.off(key, next);
   };
 
   return {
@@ -109,7 +126,7 @@ export const atom = <T>(defaultValue: T, key = id()): Atom<T> => {
  *
  * @param set Function to set new states to other atoms.
  *
- * @param key A unique string that allows you to identify the atom.
+ * @param key A unique value that allows you to identify the atom.
  *
  * @returns A new dynamic atom that lets you read and update dependent
  * atoms state.
@@ -127,56 +144,45 @@ export const atom = <T>(defaultValue: T, key = id()): Atom<T> => {
  *
  * @noinline
  */
-export const dynamicAtom = <T>(
+export const dynamicAtom = <Value, Update = undefined>(
   get: (
-    get: <V>(atom: Atom<V>) => V
-  ) => T,
+    get: DynamicAtomGetter
+  ) => Value,
   set: (
-    get: <V>(atom: Atom<V>) => V,
-    set: <V>(atom: Atom<V>, value: AtomValOrUpdater<V>) => V,
-    arg: T
-  ) => T,
-  key = id()
-): Atom<T> => {
-  const depend: string[] = [];
+    get: DynamicAtomGetter,
+    set: DynamicAtomSetter,
+    update: Update
+  ) => Value,
+  key: AtomKey = id()
+): Atom<Value, Update> => {
+  const _depend: AtomKey[] = [];
 
-  const defaultValue = get((from) => {
+  const _get = () => get((from) => {
     const _key = from.key;
 
-    if (depend.includes(_key)) {
-      depend.push(_key);
+    if (_key === key) {
+      return unsafe_store.get(_key);
+    }
+
+    if (!_depend.includes(_key)) {
+      _depend.push(_key);
     }
 
     return from.get();
   });
 
-  const _get = () => get((from) => from.get());
+  const _set = (update: AtomValueUpdate<Value, Update>) => set(
+    (from) => from.get(),
+    (from, _update) => from.set(_update),
+    typeof update === 'function' ? (update as AtomUpdater<Value, Update>)(unsafe_store.get(key)) : update
+  );
 
-  const _set = (arg: AtomValOrUpdater<T>) => {
-    const next = set(
-      (from) => from.get(),
-      (from, value) => from.set(value),
-      typeof arg === 'function' ? (arg as AtomUpdater<T>)(store.get(key) as T) : arg
-    );
+  const _dynamic = atom(_get(), key);
+  const _update = _dynamic.set;
 
-    store.set(key, next);
+  _dynamic.set = (arg) => _update(_set(arg as any));
 
-    return next;
-  };
+  _depend.some((_key) => unsafe_updater.on(_key, () => _update(_get())));
 
-  const _sub = (next: (value: T) => void) => {
-    const handle = (value: T) => next(_set(value));
-
-    depend.some((_key) => updater.on(_key, handle));
-
-    return () => depend.some((_key) => updater.off(_key, handle));
-  };
-
-  return {
-    key,
-    def: defaultValue,
-    get: _get,
-    set: _set,
-    sub: _sub
-  };
+  return _dynamic as any;
 };

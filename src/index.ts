@@ -1,8 +1,8 @@
 export {
   atom,
   dynamicAtom,
-  store,
-  updater
+  unsafe_store,
+  unsafe_updater
 } from './store.js';
 
 export {
@@ -23,8 +23,15 @@ export {
 
 export type {
   Atom,
+  AtomKey,
   AtomUpdater,
-  AtomValOrUpdater,
-  Selector,
-  Store
+  AtomGetter,
+  AtomSelector,
+  AtomSetter,
+  AtomStore,
+  AtomStoreUpdate,
+  AtomSubscribe,
+  AtomValueUpdate,
+  DynamicAtomGetter,
+  DynamicAtomSetter
 } from './types.js';
