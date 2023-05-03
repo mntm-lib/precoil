@@ -1,4 +1,4 @@
-import type { Atom, Selector } from './types.js';
+import type { Atom, AtomSelector } from './types.js';
 
 import * as React from 'react';
 
@@ -19,7 +19,7 @@ import * as React from 'react';
  *
  * @noinline
  */
-export const useAtomSelector = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
+export const useAtomSelector = <T, S>(atom: Atom<T>, selector: AtomSelector<T, S>) => {
   const reselect = React.useRef(() => selector(atom.get())).current;
 
   return React.useSyncExternalStore(
@@ -42,7 +42,7 @@ export const useAtomSelector = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, se
  *
  * @nosideeffects
  */
-export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
+export const useAtomValue = <T>(atom: Atom<T>) => {
   return React.useSyncExternalStore(
     atom.sub,
     atom.get,
@@ -63,7 +63,7 @@ export const useAtomValue = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  *
  * @nosideeffects
  */
-export const useSetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
+export const useSetAtomState = <T>(atom: Atom<T>) => {
   return React.useRef(atom.set).current;
 };
 
@@ -81,7 +81,7 @@ export const useSetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  *
  * @nosideeffects
  */
-export const useAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
+export const useAtomState = <T>(atom: Atom<T>) => {
   const state = useAtomValue(atom);
   const update = useSetAtomState(atom);
 
@@ -100,7 +100,7 @@ export const useAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  *
  * @nosideeffects
  */
-export const useResetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
+export const useResetAtomState = <T>(atom: Atom<T>) => {
   return React.useRef(() => atom.set(atom.def)).current;
 };
 
@@ -117,8 +117,8 @@ export const useResetAtomState = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => 
  *
  * @nosideeffects
  */
-export const useAtomConst = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
-  return React.useState(atom.get)[0];
+export const useAtomConst = <T>(atom: Atom<T>) => {
+  return React.useMemo(atom.get, []);
 };
 
 /**
@@ -134,6 +134,6 @@ export const useAtomConst = /*#__INLINE__*/<T>(atom: Readonly<Atom<T>>) => {
  *
  * @nosideeffects
  */
-export const useAtomSelectorConst = /*#__INLINE__*/<T, S>(atom: Readonly<Atom<T>>, selector: Selector<T, S>) => {
-  return React.useState(() => selector(atom.get()))[0];
+export const useAtomSelectorConst = <T, S>(atom: Atom<T>, selector: AtomSelector<T, S>) => {
+  return React.useMemo(() => selector(atom.get()), []);
 };

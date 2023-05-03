@@ -1,18 +1,32 @@
-export type Store = Map<string, unknown>;
+export type AtomKey = string | number | symbol;
 
-export type AtomUpdater<T> = (state: T) => T;
-export type AtomValOrUpdater<T> = T | AtomUpdater<T>;
+export type AtomStore = Map<AtomKey, any>;
+export type AtomStoreUpdate = Record<AtomKey, any>;
 
-export type Selector<T, S> = (partial: T) => S;
+export type AtomUpdater<Value, Update = Value> = (value: Value) => Update;
+export type AtomValueUpdate<Value, Update = Value> = Update | AtomUpdater<Value, Update>;
 
-export type AtomGetter<T> = () => T;
-export type AtomSetter<T> = (value: AtomValOrUpdater<T>) => T;
-export type AtomSubscribe<T> = (set: (value: T) => void) => () => void;
+export type AtomSelector<Value, Selected> = (value: Value) => Selected;
 
-export type Atom<T> = {
-  key: string;
-  def: T;
-  get: AtomGetter<T>;
-  set: AtomSetter<T>;
-  sub: AtomSubscribe<T>;
+export type AtomGetter<Value> = () => Value;
+export type AtomSetter<Value, Update = Value> = (update: AtomValueUpdate<Value, Update>) => Value;
+
+export type AtomSubscribe<Value> = (next: (value: Value) => void) => () => void;
+
+export type Atom<Value, Update = Value> = {
+  readonly key: AtomKey;
+  readonly def: Value;
+
+  get: AtomGetter<Value>;
+  set: AtomSetter<Value, Update>;
+  sub: AtomSubscribe<Value>;
 };
+
+export type DynamicAtomGetter = <Value, Update = Value>(
+  atom: Atom<Value, Update>
+) => Value;
+
+export type DynamicAtomSetter = <Value, Update = Value>(
+  atom: Atom<Value, Update>,
+  update: AtomValueUpdate<Value, Update>
+) => Value;
