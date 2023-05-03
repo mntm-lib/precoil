@@ -38,6 +38,9 @@ export default defineConfig({
       'es6'
     ],
     rollupOptions: {
+      output: {
+        interop: 'compat'
+      },
       external: [
         'react',
         'react-dom',
